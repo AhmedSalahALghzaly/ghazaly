@@ -1,0 +1,591 @@
+CREATE SCHEMA "public";
+
+CREATE TABLE "admins" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "email" varchar(255) NOT NULL CONSTRAINT "admins_email_key" UNIQUE,
+  "name" varchar(255),
+  "phone" varchar(50),
+  "address" text,
+  "permissions" jsonb DEFAULT '{}',
+  "deleted_at" TIMESTAMP WITH TIME ZONE,
+  "created_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
+CREATE TABLE "ai_training_logs" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "knowledge_id" uuid,
+  "status" varchar(20) DEFAULT 'pending' NOT NULL,
+  "result" jsonb DEFAULT '{}',
+  "created_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
+CREATE TABLE "appointments" (
+  "id" varchar(36) PRIMARY KEY,
+  "user_id" varchar(36),
+  "user_name" varchar(255),
+  "user_email" varchar(255),
+  "user_phone" varchar(50),
+  "service_type" varchar(100) DEFAULT 'maintenance' NOT NULL,
+  "car_info" varchar(255),
+  "notes" text,
+  "appointment_date" TIMESTAMP WITH TIME ZONE NOT NULL,
+  "duration_minutes" integer DEFAULT 60 NOT NULL,
+  "status" varchar(50) DEFAULT 'pending' NOT NULL,
+  "calendar_event_id" varchar(255),
+  "created_at" TIMESTAMP WITH TIME ZONE DEFAULT now(),
+  "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+CREATE TABLE "bundle_offers" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "name" varchar(255),
+  "name_ar" varchar(255),
+  "description" text,
+  "description_ar" text,
+  "discount_percentage" numeric(5, 2) DEFAULT '0',
+  "target_car_model_id" uuid,
+  "product_ids" jsonb DEFAULT '[]',
+  "image" text,
+  "is_active" boolean DEFAULT TRUE,
+  "deleted_at" TIMESTAMP WITH TIME ZONE,
+  "created_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
+CREATE TABLE "car_brands" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "name" varchar(255) NOT NULL,
+  "name_ar" varchar(255),
+  "logo" text,
+  "distributor_id" uuid,
+  "deleted_at" TIMESTAMP WITH TIME ZONE,
+  "created_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
+CREATE TABLE "car_models" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "brand_id" uuid NOT NULL,
+  "name" varchar(255) NOT NULL,
+  "name_ar" varchar(255),
+  "year_start" integer,
+  "year_end" integer,
+  "image_url" text,
+  "images" jsonb DEFAULT '[]',
+  "description" text,
+  "description_ar" text,
+  "variants" jsonb DEFAULT '[]',
+  "chassis_number" varchar(255),
+  "catalog_pdf" text,
+  "fuel_type" varchar(50),
+  "deleted_at" TIMESTAMP WITH TIME ZONE,
+  "created_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
+CREATE TABLE "cart_items" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "user_id" uuid NOT NULL,
+  "product_id" uuid NOT NULL,
+  "quantity" integer DEFAULT 1,
+  "original_unit_price" numeric(12, 2),
+  "final_unit_price" numeric(12, 2),
+  "discount_details" jsonb,
+  "bundle_group_id" uuid,
+  "bundle_offer_id" uuid,
+  "bundle_discount_percentage" numeric(5, 2),
+  "added_by_admin_id" uuid,
+  "created_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
+CREATE TABLE "categories" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "name" varchar(255) NOT NULL,
+  "name_ar" varchar(255),
+  "parent_id" uuid,
+  "icon" text,
+  "image_data" text,
+  "deleted_at" TIMESTAMP WITH TIME ZONE,
+  "created_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
+CREATE TABLE "comments" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "product_id" uuid NOT NULL,
+  "user_id" uuid NOT NULL,
+  "text" text,
+  "rating" integer DEFAULT 5,
+  "deleted_at" TIMESTAMP WITH TIME ZONE,
+  "created_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
+CREATE TABLE "conversation_group_members" (
+  "group_id" uuid,
+  "conversation_id" uuid,
+  "added_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  CONSTRAINT "conversation_group_members_pkey" PRIMARY KEY ("group_id", "conversation_id")
+);
+
+CREATE TABLE "conversation_groups" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "name" varchar(255) NOT NULL,
+  "color" varchar(20) DEFAULT '#7C3AED' NOT NULL,
+  "created_by" uuid,
+  "created_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
+CREATE TABLE "conversations" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "user_id" uuid NOT NULL,
+  "agent_id" uuid,
+  "type" varchar(20) DEFAULT 'direct_chat' NOT NULL,
+  "status" varchar(20) DEFAULT 'active' NOT NULL,
+  "ai_auto_reply" boolean DEFAULT TRUE NOT NULL,
+  "deleted_at" TIMESTAMP WITH TIME ZONE,
+  "created_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
+CREATE TABLE "distributors" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "name" varchar(255) NOT NULL,
+  "name_ar" varchar(255),
+  "phone" varchar(50),
+  "email" varchar(255),
+  "address" text,
+  "address_ar" text,
+  "notes" text,
+  "phone_numbers" jsonb DEFAULT '[]',
+  "contact_email" varchar(255),
+  "website_url" text,
+  "description" text,
+  "description_ar" text,
+  "profile_image" text,
+  "slider_images" jsonb DEFAULT '[]',
+  "linked_car_brand_ids" jsonb DEFAULT '[]',
+  "deleted_at" TIMESTAMP WITH TIME ZONE,
+  "created_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
+CREATE TABLE "email_verification_codes" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "email" varchar(255) NOT NULL,
+  "code" varchar(10) NOT NULL,
+  "expires_at" TIMESTAMP WITH TIME ZONE NOT NULL,
+  "created_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
+CREATE TABLE "favorites" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "user_id" uuid NOT NULL UNIQUE,
+  "product_id" uuid NOT NULL UNIQUE,
+  "created_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  CONSTRAINT "favorites_user_id_product_id_key" UNIQUE ("user_id", "product_id")
+);
+
+CREATE TABLE "knowledge_base" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "type" varchar(20) NOT NULL,
+  "title" varchar(500),
+  "content" text,
+  "file_url" text,
+  "metadata" jsonb DEFAULT '{}',
+  "created_by" uuid,
+  "created_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
+CREATE TABLE "marketing_slides" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "title" varchar(500),
+  "title_ar" varchar(500),
+  "image" text,
+  "link_url" text,
+  "sort_order" integer DEFAULT 0,
+  "is_active" boolean DEFAULT TRUE,
+  "created_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
+CREATE TABLE "messages" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "conversation_id" uuid NOT NULL,
+  "sender_id" uuid NOT NULL,
+  "sender_type" varchar(20) DEFAULT 'customer' NOT NULL,
+  "content" text,
+  "message_type" varchar(20) DEFAULT 'text' NOT NULL,
+  "file_url" text,
+  "is_read" boolean DEFAULT FALSE NOT NULL,
+  "created_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  "ai_auto_reply_sent" boolean DEFAULT FALSE NOT NULL
+);
+
+CREATE TABLE "notifications" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "user_id" uuid,
+  "title" varchar(500),
+  "title_ar" varchar(500),
+  "message" text,
+  "message_ar" text,
+  "type" varchar(50) DEFAULT 'info',
+  "is_read" boolean DEFAULT FALSE,
+  "metadata" jsonb DEFAULT '{}',
+  "created_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
+CREATE TABLE "orders" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "user_id" uuid,
+  "order_number" varchar(50),
+  "first_name" varchar(255),
+  "last_name" varchar(255),
+  "email" varchar(255),
+  "phone" varchar(50),
+  "street_address" text,
+  "city" varchar(255),
+  "state" varchar(255),
+  "country" varchar(255),
+  "delivery_instructions" text,
+  "payment_method" varchar(50),
+  "notes" text,
+  "status" varchar(50) DEFAULT 'pending',
+  "total_amount" numeric(12, 2) DEFAULT '0',
+  "shipping_cost" numeric(12, 2) DEFAULT '0',
+  "items" jsonb DEFAULT '[]',
+  "customer_last_read_status" varchar(50),
+  "customer_read_at" TIMESTAMP WITH TIME ZONE,
+  "deleted_at" TIMESTAMP WITH TIME ZONE,
+  "created_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
+CREATE TABLE "owners" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "email" varchar(255) NOT NULL CONSTRAINT "owners_email_key" UNIQUE,
+  "name" varchar(255),
+  "phone" varchar(50),
+  "deleted_at" TIMESTAMP WITH TIME ZONE,
+  "created_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
+CREATE TABLE "partners" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "email" varchar(255) NOT NULL CONSTRAINT "partners_email_key" UNIQUE,
+  "name" varchar(255),
+  "phone" varchar(50),
+  "company_name" varchar(255),
+  "deleted_at" TIMESTAMP WITH TIME ZONE,
+  "created_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
+CREATE TABLE "password_requests" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "user_id" uuid,
+  "email" varchar(255),
+  "phone" varchar(50),
+  "status" varchar(50) DEFAULT 'pending',
+  "created_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
+CREATE TABLE "product_brands" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "name" varchar(255) NOT NULL,
+  "name_ar" varchar(255),
+  "logo" text,
+  "country_of_origin" varchar(255),
+  "country_of_origin_ar" varchar(255),
+  "supplier_id" uuid,
+  "deleted_at" TIMESTAMP WITH TIME ZONE,
+  "created_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
+CREATE TABLE "products" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "name" varchar(255) NOT NULL,
+  "name_ar" varchar(255),
+  "description" text,
+  "description_ar" text,
+  "price" numeric(12, 2) DEFAULT '0',
+  "sku" varchar(100),
+  "product_brand_id" uuid,
+  "category_id" uuid,
+  "image_url" text,
+  "images" jsonb DEFAULT '[]',
+  "car_model_ids" jsonb DEFAULT '[]',
+  "stock_quantity" integer DEFAULT 0,
+  "hidden_status" boolean DEFAULT FALSE,
+  "added_by_admin_id" uuid,
+  "deleted_at" TIMESTAMP WITH TIME ZONE,
+  "created_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
+CREATE TABLE "promotions" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "title" varchar(500),
+  "title_ar" varchar(500),
+  "image" text,
+  "promotion_type" varchar(50),
+  "is_active" boolean DEFAULT TRUE,
+  "target_product_id" uuid,
+  "target_car_model_id" uuid,
+  "sort_order" integer DEFAULT 0,
+  "deleted_at" TIMESTAMP WITH TIME ZONE,
+  "created_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
+CREATE TABLE "sessions" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "user_id" uuid NOT NULL,
+  "session_token" text NOT NULL CONSTRAINT "sessions_session_token_key" UNIQUE,
+  "expires_at" TIMESTAMP WITH TIME ZONE NOT NULL,
+  "created_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
+CREATE TABLE "subscribers" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "email" varchar(255) NOT NULL,
+  "name" varchar(255),
+  "phone" varchar(50),
+  "subscription_type" varchar(50) DEFAULT 'basic',
+  "deleted_at" TIMESTAMP WITH TIME ZONE,
+  "created_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
+CREATE TABLE "subscription_requests" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "customer_name" varchar(255),
+  "email" varchar(255),
+  "phone" varchar(50),
+  "governorate" varchar(255),
+  "village" varchar(255),
+  "detailed_address" text,
+  "car_model_name" varchar(255),
+  "business_type" varchar(100),
+  "request_type" varchar(100),
+  "notes" text,
+  "status" varchar(50) DEFAULT 'pending',
+  "created_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
+CREATE TABLE "suppliers" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "name" varchar(255) NOT NULL,
+  "name_ar" varchar(255),
+  "phone" varchar(50),
+  "email" varchar(255),
+  "address" text,
+  "address_ar" text,
+  "notes" text,
+  "phone_numbers" jsonb DEFAULT '[]',
+  "contact_email" varchar(255),
+  "website_url" text,
+  "description" text,
+  "description_ar" text,
+  "profile_image" text,
+  "slider_images" jsonb DEFAULT '[]',
+  "linked_product_brand_ids" jsonb DEFAULT '[]',
+  "deleted_at" TIMESTAMP WITH TIME ZONE,
+  "created_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
+CREATE TABLE "users" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "email" varchar(255) NOT NULL CONSTRAINT "users_email_key" UNIQUE,
+  "name" varchar(255),
+  "password_hash" text,
+  "picture" text,
+  "phone" varchar(50),
+  "phone_verified" boolean DEFAULT FALSE,
+  "email_verified" boolean DEFAULT FALSE,
+  "is_admin" boolean DEFAULT FALSE,
+  "subscription_status" varchar(50) DEFAULT 'free',
+  "replit_user_id" varchar(255),
+  "owner_temp_password" text,
+  "deleted_at" TIMESTAMP WITH TIME ZONE,
+  "created_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
+ALTER TABLE "ai_training_logs"
+ADD CONSTRAINT "ai_training_logs_knowledge_id_fkey" FOREIGN KEY ("knowledge_id") REFERENCES "knowledge_base" ("id") ON DELETE CASCADE;
+
+ALTER TABLE "car_brands"
+ADD CONSTRAINT "car_brands_distributor_id_fkey" FOREIGN KEY ("distributor_id") REFERENCES "distributors" ("id") ON DELETE SET NULL;
+
+ALTER TABLE "car_models"
+ADD CONSTRAINT "car_models_brand_id_fkey" FOREIGN KEY ("brand_id") REFERENCES "car_brands" ("id") ON DELETE CASCADE;
+
+ALTER TABLE "cart_items"
+ADD CONSTRAINT "cart_items_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "products" ("id") ON DELETE CASCADE;
+
+ALTER TABLE "cart_items"
+ADD CONSTRAINT "cart_items_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users" ("id") ON DELETE CASCADE;
+
+ALTER TABLE "categories"
+ADD CONSTRAINT "categories_parent_id_fkey" FOREIGN KEY ("parent_id") REFERENCES "categories" ("id") ON DELETE SET NULL;
+
+ALTER TABLE "comments"
+ADD CONSTRAINT "comments_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "products" ("id") ON DELETE CASCADE;
+
+ALTER TABLE "comments"
+ADD CONSTRAINT "comments_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users" ("id") ON DELETE CASCADE;
+
+ALTER TABLE "conversation_group_members"
+ADD CONSTRAINT "conversation_group_members_conversation_id_fkey" FOREIGN KEY ("conversation_id") REFERENCES "conversations" ("id") ON DELETE CASCADE;
+
+ALTER TABLE "conversation_group_members"
+ADD CONSTRAINT "conversation_group_members_group_id_fkey" FOREIGN KEY ("group_id") REFERENCES "conversation_groups" ("id") ON DELETE CASCADE;
+
+ALTER TABLE "favorites"
+ADD CONSTRAINT "favorites_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "products" ("id") ON DELETE CASCADE;
+
+ALTER TABLE "favorites"
+ADD CONSTRAINT "favorites_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users" ("id") ON DELETE CASCADE;
+
+ALTER TABLE "messages"
+ADD CONSTRAINT "messages_conversation_id_fkey" FOREIGN KEY ("conversation_id") REFERENCES "conversations" ("id") ON DELETE CASCADE;
+
+ALTER TABLE "notifications"
+ADD CONSTRAINT "notifications_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users" ("id") ON DELETE CASCADE;
+
+ALTER TABLE "orders"
+ADD CONSTRAINT "orders_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users" ("id") ON DELETE SET NULL;
+
+ALTER TABLE "password_requests"
+ADD CONSTRAINT "password_requests_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users" ("id") ON DELETE CASCADE;
+
+ALTER TABLE "product_brands"
+ADD CONSTRAINT "product_brands_supplier_id_fkey" FOREIGN KEY ("supplier_id") REFERENCES "suppliers" ("id") ON DELETE SET NULL;
+
+ALTER TABLE "products"
+ADD CONSTRAINT "products_category_id_fkey" FOREIGN KEY ("category_id") REFERENCES "categories" ("id") ON DELETE SET NULL;
+
+ALTER TABLE "products"
+ADD CONSTRAINT "products_product_brand_id_fkey" FOREIGN KEY ("product_brand_id") REFERENCES "product_brands" ("id") ON DELETE SET NULL;
+
+ALTER TABLE "sessions"
+ADD CONSTRAINT "sessions_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users" ("id") ON DELETE CASCADE;
+
+CREATE UNIQUE INDEX "admins_email_key" ON "admins" ("email");
+
+CREATE UNIQUE INDEX "admins_pkey" ON "admins" ("id");
+
+CREATE UNIQUE INDEX "ai_training_logs_pkey" ON "ai_training_logs" ("id");
+
+CREATE UNIQUE INDEX "appointments_pkey" ON "appointments" ("id");
+
+CREATE UNIQUE INDEX "bundle_offers_pkey" ON "bundle_offers" ("id");
+
+CREATE UNIQUE INDEX "car_brands_pkey" ON "car_brands" ("id");
+
+CREATE UNIQUE INDEX "car_models_pkey" ON "car_models" ("id");
+
+CREATE INDEX "idx_car_models_brand" ON "car_models" ("brand_id");
+
+CREATE UNIQUE INDEX "cart_items_pkey" ON "cart_items" ("id");
+
+CREATE INDEX "idx_cart_items_user" ON "cart_items" ("user_id");
+
+CREATE UNIQUE INDEX "categories_pkey" ON "categories" ("id");
+
+CREATE UNIQUE INDEX "comments_pkey" ON "comments" ("id");
+
+CREATE UNIQUE INDEX "conversation_group_members_pkey" ON "conversation_group_members" ("group_id", "conversation_id");
+
+CREATE UNIQUE INDEX "conversation_groups_pkey" ON "conversation_groups" ("id");
+
+CREATE UNIQUE INDEX "conversations_pkey" ON "conversations" ("id");
+
+CREATE INDEX "idx_conversations_status" ON "conversations" ("status");
+
+CREATE INDEX "idx_conversations_user_id" ON "conversations" ("user_id");
+
+CREATE UNIQUE INDEX "distributors_pkey" ON "distributors" ("id");
+
+CREATE UNIQUE INDEX "email_verification_codes_pkey" ON "email_verification_codes" ("id");
+
+CREATE UNIQUE INDEX "favorites_pkey" ON "favorites" ("id");
+
+CREATE UNIQUE INDEX "favorites_user_id_product_id_key" ON "favorites" ("user_id", "product_id");
+
+CREATE INDEX "idx_favorites_user" ON "favorites" ("user_id");
+
+CREATE INDEX "idx_knowledge_base_type" ON "knowledge_base" ("type");
+
+CREATE UNIQUE INDEX "knowledge_base_pkey" ON "knowledge_base" ("id");
+
+CREATE UNIQUE INDEX "marketing_slides_pkey" ON "marketing_slides" ("id");
+
+CREATE INDEX "idx_messages_conversation_id" ON "messages" ("conversation_id");
+
+CREATE INDEX "idx_messages_created_at" ON "messages" ("created_at");
+
+CREATE UNIQUE INDEX "messages_pkey" ON "messages" ("id");
+
+CREATE INDEX "idx_notifications_user" ON "notifications" ("user_id");
+
+CREATE UNIQUE INDEX "notifications_pkey" ON "notifications" ("id");
+
+CREATE INDEX "idx_orders_status" ON "orders" ("status");
+
+CREATE INDEX "idx_orders_user" ON "orders" ("user_id");
+
+CREATE UNIQUE INDEX "orders_pkey" ON "orders" ("id");
+
+CREATE UNIQUE INDEX "owners_email_key" ON "owners" ("email");
+
+CREATE UNIQUE INDEX "owners_pkey" ON "owners" ("id");
+
+CREATE UNIQUE INDEX "partners_email_key" ON "partners" ("email");
+
+CREATE UNIQUE INDEX "partners_pkey" ON "partners" ("id");
+
+CREATE UNIQUE INDEX "password_requests_pkey" ON "password_requests" ("id");
+
+CREATE UNIQUE INDEX "product_brands_pkey" ON "product_brands" ("id");
+
+CREATE INDEX "idx_products_brand" ON "products" ("product_brand_id");
+
+CREATE INDEX "idx_products_category" ON "products" ("category_id");
+
+CREATE UNIQUE INDEX "products_pkey" ON "products" ("id");
+
+CREATE UNIQUE INDEX "promotions_pkey" ON "promotions" ("id");
+
+CREATE INDEX "idx_sessions_token" ON "sessions" ("session_token");
+
+CREATE INDEX "idx_sessions_user" ON "sessions" ("user_id");
+
+CREATE UNIQUE INDEX "sessions_pkey" ON "sessions" ("id");
+
+CREATE UNIQUE INDEX "sessions_session_token_key" ON "sessions" ("session_token");
+
+CREATE UNIQUE INDEX "subscribers_pkey" ON "subscribers" ("id");
+
+CREATE UNIQUE INDEX "subscription_requests_pkey" ON "subscription_requests" ("id");
+
+CREATE UNIQUE INDEX "suppliers_pkey" ON "suppliers" ("id");
+
+CREATE INDEX "idx_users_email" ON "users" ("email");
+
+CREATE UNIQUE INDEX "users_email_key" ON "users" ("email");
+
+CREATE UNIQUE INDEX "users_pkey" ON "users" ("id");
