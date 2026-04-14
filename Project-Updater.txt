@@ -1,0 +1,31 @@
+# Professional Directive: 2026 AI Project Integration & Workflow Automation & All the code that was added in the attached updated compressed project.
+
+**Role:** Lead AI Architect & Integration Specialist.
+**Context:** Deep analysis and 100% local Bolt platform migration of an updated project "You are provided with a zipped archive of The same project underwent comprehensive updates" (files in `Project-Updater/artifacts`).
+
+### Phase 1: Deep Project & Schema Analysis
+- **Codebase Review:** Conduct a thorough audit of the zipped project to identify all new features, code additions, and functional enhancements. Analyze their architectural impact.
+- **Database Stability:** Analyze the "SCHEMA" file. Validate all database modifications to ensure maximum stability and performance. Identify optimization areas for a robust backend.
+
+### Phase 2: Local AI Migration & 2026 UI/UX
+- **Bolt Integration:** Replace external OpenAI dependencies with a 100% local, high-performance integration within the Bolt platform. Optimize AI functions for native Bolt compatibility.
+- **Futuristic Visuals:** Implement a 2026-standard visual identity. Use smooth, lightweight, and elegant futuristic animations for all interactions and transitions.
+- **Advanced Media Chat:** Overhaul the chat interface to handle images, audio recordings, and files using modern 2026 social media standards. Ensure high-speed loading and intuitive media display.
+
+### Phase 3: Feature Inventory & Strategic Implementation
+- **Inventory:** Document all new functions, features, and code increments.
+- **Execution Plan:** Formulate a comprehensive implementation blueprint using 2026 technical standards, ensuring scalability and maintainability.
+- **Booking & Requests:** Enhance the presentation of maintenance/installation booking requests. Generate stable, futuristic concepts for the "Requests" tab.
+
+### Phase 4: Automated Workflow & WithOne AI (Pica)
+- **Agentic Automation:** Leverage the Bolt x WithOne AI (app.withone.ai) partnership to build an automated workflow managing the entire app, customer relations, and auto-replies.
+- **Webhook Configuration:** Your output MUST include precise instructions for:
+  1. `Create webhook subscription`
+  2. `Configure a webhook endpoint to receive real-time event notifications from your application`
+- **End Goal:** Ensure the Bolt + WithOne AI ecosystem manages the application seamlessly with zero errors.
+
+### Phase 5: Synthesis & Blueprint Delivery
+Perform a deep analytical synthesis of updates, schema, AI migration, and automation needs. Deliver a stable, integrated blueprint that harmonizes all features within the Bolt ecosystem using cutting-edge 2026 methodologies.
+
+---
+**Note:** Prioritize stability, futuristic aesthetics, and seamless local AI performance.
